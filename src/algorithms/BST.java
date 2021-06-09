@@ -21,8 +21,6 @@ public class BST implements BSTInterface {
 
     private Node root;
 
-
-
     public BST() {
         this.root = null;
     }
@@ -67,7 +65,6 @@ public class BST implements BSTInterface {
         if (this.root == null){
             return false;
         }
-        System.out.println("contains was called");
         Node locationOfKey = findAnItemsPlace(key, false);
         if (locationOfKey == null){
             //Did not find the item
@@ -84,16 +81,15 @@ public class BST implements BSTInterface {
     private void addSumAndCount(int key, boolean insert){
         if (insert){
             this.count +=1;
-            this.sum +=key;
+            this.sum +=(long)key;
         }
         else{
             this.count -=1;
-            this.sum -=key;
+            this.sum -=(long)key;
         }
     }
 
     public final boolean insert(final int key) {
-        System.out.println("insert was called");
         if (this.root == null){
             this.root = new Node(key);
             this.addSumAndCount(key, true);
@@ -131,11 +127,47 @@ public class BST implements BSTInterface {
                 //Then next is the successor
                 return prev;
             }
-            Node temp = next;
             prev = next;
             next = next.leftChild;
         }
-        return prev;
+    }
+
+    private void removeRoot(){
+        if (this.root.leftChild == null && this.root.rightChild == null){
+            this.root = null;
+            return;
+        }
+
+        if (this.root.leftChild == null){
+            //this means the right child is not null
+            this.root = this.root.rightChild;
+            return;
+        }
+        if (this.root.rightChild == null){
+            //this means the left child is not null
+            this.root = this.root.leftChild;
+            return;
+        }
+
+        //Now we know that both are not null
+        Node successorParent = this.findSuccessorsParent(this.root);
+
+        if (successorParent == this.root){
+            //this means that the root has right child with no left childs
+            Node successor = successorParent.rightChild;
+            successor.leftChild = this.root.rightChild;
+            this.root = successor;
+            return;
+        }
+
+        //Now we know that the root has right child with left children
+        Node successor = successorParent.leftChild;
+        successorParent.leftChild = successor.rightChild;
+        successor.rightChild = this.root.rightChild;
+        successor.leftChild = this.root.leftChild;
+        this.root = successor;
+        return;
+
     }
 
 
@@ -144,12 +176,10 @@ public class BST implements BSTInterface {
             return false;
         }
         if (this.root.valueOfTheNode == key){
-            this.root = null;
-
+            removeRoot();
             this.addSumAndCount(key, false);
-
+            return true;
         }
-        System.out.println("remove was called");
         Node parentOfKey = findAnItemsPlace(key, true);
         if (parentOfKey == null){
             //Did not find the item
@@ -271,7 +301,6 @@ public class BST implements BSTInterface {
     // NOTE: Guaranteed to be called without concurrent operations,
 	// so need to be thread-safe.  The method will only be called
 	// once the benchmark completes.
-        System.out.println("size was called");
         return  this.count;
     }
 
@@ -282,7 +311,6 @@ public class BST implements BSTInterface {
 	//
 	// Make sure to sum over a "long" variable or you will get incorrect
 	// results due to integer overflow!
-        System.out.println("getKeySum was called");
         return this.sum;
     }
 }

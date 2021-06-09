@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch myMain",
+            "request": "launch",
+            "mainClass": "main.myMain",
+            "projectName": "hw5_ab041567"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -16,7 +23,7 @@
             "request": "launch",
             "mainClass": "main.Main",
             "projectName": "hw5_ab041567",
-            "args": "1 1 5 -ins50 -del50 -keys1048576"
+            "args": "1 1 1 -ins50 -del50 -keys1048576"
         }
     ]
 }
