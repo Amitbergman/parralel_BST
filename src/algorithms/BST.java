@@ -16,6 +16,9 @@ public class BST implements BSTInterface {
         }
     }
 
+    private long sum = 0;
+    private int count = 0;
+
     private Node root;
 
 
@@ -78,10 +81,22 @@ public class BST implements BSTInterface {
         return false;
     }
 
+    private void addSumAndCount(int key, boolean insert){
+        if (insert){
+            this.count +=1;
+            this.sum +=key;
+        }
+        else{
+            this.count -=1;
+            this.sum -=key;
+        }
+    }
+
     public final boolean insert(final int key) {
         System.out.println("insert was called");
         if (this.root == null){
             this.root = new Node(key);
+            this.addSumAndCount(key, true);
             return true;
         }
         Node locationOfKey = findAnItemsPlace(key, false);
@@ -96,10 +111,12 @@ public class BST implements BSTInterface {
         }
         if (locationOfKey.valueOfTheNode > key){
             locationOfKey.leftChild = new Node(key);
+            this.addSumAndCount(key, true);
             return true;
         }
         else{
             locationOfKey.rightChild = new Node(key);
+            this.addSumAndCount(key, true);
             return true;
         }
     }
@@ -128,6 +145,9 @@ public class BST implements BSTInterface {
         }
         if (this.root.valueOfTheNode == key){
             this.root = null;
+
+            this.addSumAndCount(key, false);
+
         }
         System.out.println("remove was called");
         Node parentOfKey = findAnItemsPlace(key, true);
@@ -136,24 +156,43 @@ public class BST implements BSTInterface {
             System.out.println("This should never happen");
             return false;
         }
-        if (parentOfKey.leftChild.valueOfTheNode != key && parentOfKey.rightChild.valueOfTheNode != key){
+        if (parentOfKey.leftChild == null && parentOfKey.rightChild == null){
             //He is not in the set
             return false;
         }
-        
+        if (parentOfKey.leftChild == null){
+            if (parentOfKey.rightChild.valueOfTheNode != key){
+                //He is not in the set
+                return false;
+            }
+        }
+        if (parentOfKey.rightChild == null){
+            if (parentOfKey.leftChild.valueOfTheNode != key){
+                //He is not in the set
+                return false;
+            }
+        }
+
+        if (parentOfKey.leftChild.valueOfTheNode != key && parentOfKey.rightChild.valueOfTheNode != key){
+            return false;
+        }
+
         //Now we know that one of the children of parentOfKey is our node
         if (parentOfKey.rightChild.valueOfTheNode == key){
             Node ourNodeToRemove = parentOfKey.rightChild;
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild == null){
                 parentOfKey.rightChild = null;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
                 parentOfKey.rightChild = ourNodeToRemove.leftChild;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
                 parentOfKey.rightChild = ourNodeToRemove.rightChild;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
@@ -173,6 +212,7 @@ public class BST implements BSTInterface {
                 else{
                     successorsParent.rightChild = null;
                 }
+                this.addSumAndCount(key, false);
                 return true;
             }
         }
@@ -182,14 +222,17 @@ public class BST implements BSTInterface {
             Node ourNodeToRemove = parentOfKey.leftChild;
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild == null){
                 parentOfKey.leftChild = null;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
                 parentOfKey.leftChild = ourNodeToRemove.leftChild;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
                 parentOfKey.leftChild = ourNodeToRemove.rightChild;
+                this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
@@ -210,9 +253,11 @@ public class BST implements BSTInterface {
                 else{
                     successorsParent.rightChild = null;
                 }
+                this.addSumAndCount(key, false);
                 return true;
             }
         }
+        return false;
 
     }
 
@@ -227,7 +272,7 @@ public class BST implements BSTInterface {
 	// so need to be thread-safe.  The method will only be called
 	// once the benchmark completes.
         System.out.println("size was called");
-        return 1;
+        return  this.count;
     }
 
     // Returns the sum of keys in the tree
@@ -238,6 +283,6 @@ public class BST implements BSTInterface {
 	// Make sure to sum over a "long" variable or you will get incorrect
 	// results due to integer overflow!
         System.out.println("getKeySum was called");
-        return 1;
+        return this.sum;
     }
 }
