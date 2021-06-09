@@ -16,6 +16,15 @@ public class BST implements BSTInterface {
         }
     }
 
+    private class finder{
+        public boolean found;
+        public boolean foundOnRoot;
+        public Node parent;
+        public boolean right;
+        public Node child;
+
+    }
+
     private long sum = 0;
     private int count = 0;
 
@@ -26,37 +35,72 @@ public class BST implements BSTInterface {
     }
 
     //Do not call it if the root is null
-    private Node findAnItemsPlace(final int key, boolean returnTheParent){
+    private finder findAnItemsPlace(final int key){
+
+        if (this.root.valueOfTheNode == key){
+            finder res = new finder();
+            res.foundOnRoot = true;
+            res.found = true;
+            return res;
+        }
         Node searcher = this.root;
         
         while (true){
             boolean shouldGoLeft = searcher.valueOfTheNode > key;
             boolean shouldGoRight = searcher.valueOfTheNode < key;
-            boolean done = searcher.valueOfTheNode == key;
-
             if (shouldGoLeft){
                 if (searcher.leftChild == null){
-                    //The place to put him is as the left child of the current node
-                    return searcher;
+                    finder res = new finder();
+                    res.foundOnRoot = false;
+                    res.found = false;
+                    res.parent = searcher;
+                    res.right = false;
+                    return res;
                 }
-                if (returnTheParent && searcher.leftChild.valueOfTheNode == key){
-                    return searcher;
+                //Left child is not null
+                if (searcher.leftChild.valueOfTheNode == key){
+                    finder res = new finder();
+                    res.foundOnRoot = false;
+                    res.found = true;
+                    res.parent = searcher;
+                    res.right = false;
+                    res.child = searcher.leftChild;
+                    return res;
+                }
+                //We should just go left and search there
+                if (searcher == searcher.leftChild){
+                    System.out.println("Should never happen");;
                 }
                 searcher = searcher.leftChild;
+                
             }
             if (shouldGoRight){
                 if (searcher.rightChild == null){
-                    //The place to put him is as the left child of the current node
-                    return searcher;
+                    finder res = new finder();
+                    res.foundOnRoot = false;
+                    res.found = false;
+                    res.parent = searcher;
+                    res.right = true;
+                    return res;
                 }
-                if (returnTheParent && searcher.rightChild.valueOfTheNode == key){
-                    return searcher;
+                //Left child is not null
+                if (searcher.rightChild.valueOfTheNode == key){
+                    finder res = new finder();
+                    res.foundOnRoot = false;
+                    res.found = true;
+                    res.parent = searcher;
+                    res.right = true;
+                    res.child = searcher.rightChild;
+                    return res;
+                }
+                //We should just go left and search there
+                 //We should just go left and search there
+                if (searcher == searcher.rightChild){
+                    System.out.println("Should never happen");;
                 }
                 searcher = searcher.rightChild;
             }
-            if (done){
-                return searcher;
-            }
+            
         }
         
     }
@@ -65,17 +109,8 @@ public class BST implements BSTInterface {
         if (this.root == null){
             return false;
         }
-        Node locationOfKey = findAnItemsPlace(key, false);
-        if (locationOfKey == null){
-            //Did not find the item
-            System.out.println("This should never happen");
-            return false;
-        }
-        if (locationOfKey.valueOfTheNode == key){
-            //We found him!
-            return true;
-        }
-        return false;
+        finder resOfFinder = findAnItemsPlace(key);
+        return resOfFinder.found;
     }
 
     private void addSumAndCount(int key, boolean insert){
@@ -95,23 +130,19 @@ public class BST implements BSTInterface {
             this.addSumAndCount(key, true);
             return true;
         }
-        Node locationOfKey = findAnItemsPlace(key, false);
-        if (locationOfKey == null){
-            //Did not find the item
-            System.out.println("This should never happen");
+        finder finderResult = findAnItemsPlace(key);
+
+        if (finderResult.found){
             return false;
         }
-        if (locationOfKey.valueOfTheNode == key){
-            //We found him so we do not do anything since he is already in the set
-            return false;
-        }
-        if (locationOfKey.valueOfTheNode > key){
-            locationOfKey.leftChild = new Node(key);
+
+        if (finderResult.right){
+            finderResult.parent.rightChild = new Node(key);
             this.addSumAndCount(key, true);
             return true;
         }
         else{
-            locationOfKey.rightChild = new Node(key);
+            finderResult.parent.leftChild = new Node(key);
             this.addSumAndCount(key, true);
             return true;
         }
@@ -175,118 +206,125 @@ public class BST implements BSTInterface {
         if (this.root == null){
             return false;
         }
-        if (this.root.valueOfTheNode == key){
+
+        finder resultOfFinder = findAnItemsPlace(key);
+        if (resultOfFinder.foundOnRoot){
             removeRoot();
             this.addSumAndCount(key, false);
             return true;
         }
-        Node parentOfKey = findAnItemsPlace(key, true);
-        if (parentOfKey == null){
-            //Did not find the item
-            System.out.println("This should never happen");
-            return false;
-        }
-        if (parentOfKey.leftChild == null && parentOfKey.rightChild == null){
-            //He is not in the set
-            return false;
-        }
-        if (parentOfKey.leftChild == null){
-            if (parentOfKey.rightChild.valueOfTheNode != key){
-                //He is not in the set
-                return false;
-            }
-        }
-        if (parentOfKey.rightChild == null){
-            if (parentOfKey.leftChild.valueOfTheNode != key){
-                //He is not in the set
-                return false;
-            }
-        }
 
-        if (parentOfKey.leftChild.valueOfTheNode != key && parentOfKey.rightChild.valueOfTheNode != key){
+        if (resultOfFinder.found == false){
+            //Did not find the item, so there is nothing to remove.
             return false;
         }
-
-        //Now we know that one of the children of parentOfKey is our node
-        if (parentOfKey.rightChild.valueOfTheNode == key){
-            Node ourNodeToRemove = parentOfKey.rightChild;
+        
+        //Now we know that the item is in the set
+        if (resultOfFinder.right){
+            //the item is the right child of parent
+            Node ourNodeToRemove = resultOfFinder.parent.rightChild;
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild == null){
-                parentOfKey.rightChild = null;
+                //The node to remove is a leaf, just cut it
+                resultOfFinder.parent.rightChild = null;
                 this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
-                parentOfKey.rightChild = ourNodeToRemove.leftChild;
+                //The node to remove has only left child
+                resultOfFinder.parent.rightChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
-                parentOfKey.rightChild = ourNodeToRemove.rightChild;
+                //The node to remove has only right child
+                resultOfFinder.parent.rightChild = ourNodeToRemove.rightChild;
                 this.addSumAndCount(key, false);
                 return true;
             }
             if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
+                //The node to remove has both right and left children
                 Node successorsParent = findSuccessorsParent(ourNodeToRemove);
-                boolean leftChild = true;
+                boolean successorIsLeftChildOfItsParent = true;
                 Node successor = successorsParent.leftChild;
                 if (successor == null){
-                    leftChild = false;
+                    successorIsLeftChildOfItsParent = false;
                     successor = successorsParent.rightChild;
                 }
-                parentOfKey.rightChild = successor;
-                successor.rightChild = ourNodeToRemove.rightChild;
-                successor.leftChild = ourNodeToRemove.leftChild;
-                if (leftChild){
-                    successorsParent.leftChild = null;
+                if (successorsParent == ourNodeToRemove){
+                    //This means that we are removing a node that is the direct parent of its successor
+                    resultOfFinder.parent.rightChild = ourNodeToRemove.rightChild;
+                    resultOfFinder.parent.rightChild.leftChild = ourNodeToRemove.leftChild;
+                    this.addSumAndCount(key, false);
+                    return true;
+                }
+                resultOfFinder.parent.rightChild = successor;
+                if (successorIsLeftChildOfItsParent){
+                    successorsParent.leftChild = successor.rightChild;
                 }
                 else{
-                    successorsParent.rightChild = null;
+                    successorsParent.rightChild = successor.rightChild;
                 }
+                successor.rightChild = ourNodeToRemove.rightChild;
+                successor.leftChild = ourNodeToRemove.leftChild;
+                this.addSumAndCount(key, false);
+                return true;
+            }
+        }
+
+         //Now we know that the item is in the set
+         if (!resultOfFinder.right){
+            //the item is the left child of parent
+            Node ourNodeToRemove = resultOfFinder.parent.leftChild;
+            if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild == null){
+                //The node to remove is a leaf, just cut it
+                resultOfFinder.parent.leftChild = null;
+                this.addSumAndCount(key, false);
+                return true;
+            }
+            if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
+                //The node to remove has only left child
+                resultOfFinder.parent.leftChild = ourNodeToRemove.leftChild;
+                this.addSumAndCount(key, false);
+                return true;
+            }
+            if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
+                //The node to remove has only right child
+                resultOfFinder.parent.leftChild = ourNodeToRemove.rightChild;
+                this.addSumAndCount(key, false);
+                return true;
+            }
+            if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
+                //The node to remove has both right and left children
+                Node successorsParent = findSuccessorsParent(ourNodeToRemove);
+                boolean successorIsLeftChildOfItsParent = true;
+                Node successor = successorsParent.leftChild;
+                if (successor == null){
+                    successorIsLeftChildOfItsParent = false;
+                    successor = successorsParent.rightChild;
+                }
+                if (successorsParent == ourNodeToRemove){
+                    //This means that we are removing a node that is the direct parent of its successor
+                    resultOfFinder.parent.leftChild = ourNodeToRemove.rightChild;
+                    resultOfFinder.parent.leftChild.leftChild = ourNodeToRemove.leftChild;
+                    this.addSumAndCount(key, false);
+                    return true;
+                }
+                resultOfFinder.parent.leftChild = successor;
+                if (successorIsLeftChildOfItsParent){
+                    successorsParent.leftChild = successor.rightChild;
+                }
+                else{
+                    successorsParent.rightChild = successor.rightChild;
+                }
+                successor.rightChild = ourNodeToRemove.rightChild;
+                successor.leftChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
                 return true;
             }
         }
 
         //Now we know that one of the children of parentOfKey is our node
-        if (parentOfKey.leftChild.valueOfTheNode == key){
-            Node ourNodeToRemove = parentOfKey.leftChild;
-            if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild == null){
-                parentOfKey.leftChild = null;
-                this.addSumAndCount(key, false);
-                return true;
-            }
-            if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
-                parentOfKey.leftChild = ourNodeToRemove.leftChild;
-                this.addSumAndCount(key, false);
-                return true;
-            }
-            if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
-                parentOfKey.leftChild = ourNodeToRemove.rightChild;
-                this.addSumAndCount(key, false);
-                return true;
-            }
-            if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
-                Node successorsParent = findSuccessorsParent(ourNodeToRemove);
-                //This means that the successor is the left child of its parent
-                boolean leftChild = true;
-                Node successor = successorsParent.leftChild;
-                if (successor == null){
-                    leftChild = false;
-                    successor = successorsParent.rightChild;
-                }
-                parentOfKey.leftChild = successor;
-                successor.rightChild = ourNodeToRemove.rightChild;
-                successor.leftChild = ourNodeToRemove.leftChild;
-                if (leftChild){
-                    successorsParent.leftChild = null;
-                }
-                else{
-                    successorsParent.rightChild = null;
-                }
-                this.addSumAndCount(key, false);
-                return true;
-            }
-        }
+       
         return false;
 
     }

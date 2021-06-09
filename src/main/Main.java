@@ -498,7 +498,7 @@ public class Main {
         int numThreads = 0;    // number of threads to use for prefilling phase
         int numOperations = 0; // number of operations to perform per thread in each iteration (up to MAX_REPS iterations)
         
-        numThreads = Math.min(48, Runtime.getRuntime().availableProcessors() / 2);
+        numThreads = 1;
         numOperations = 10 + maxkey/(2*numThreads);
 
         // we prefill over several iterations (up to MAX_REPS iterations).
