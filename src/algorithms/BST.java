@@ -1,5 +1,7 @@
 package algorithms;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import main.BSTInterface;
 
 public class BST implements BSTInterface {
@@ -24,6 +26,8 @@ public class BST implements BSTInterface {
         public Node child;
 
     }
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     private long sum = 0;
     private int count = 0;
@@ -106,10 +110,12 @@ public class BST implements BSTInterface {
     }
   
     public final boolean contains(final int key) {
+        lock.lock();
         if (this.root == null){
             return false;
         }
         finder resOfFinder = findAnItemsPlace(key);
+        lock.unlock();
         return resOfFinder.found;
     }
 
@@ -125,25 +131,30 @@ public class BST implements BSTInterface {
     }
 
     public final boolean insert(final int key) {
+        lock.lock();
         if (this.root == null){
             this.root = new Node(key);
             this.addSumAndCount(key, true);
+            lock.unlock();
             return true;
         }
         finder finderResult = findAnItemsPlace(key);
 
         if (finderResult.found){
+            lock.unlock();
             return false;
         }
 
         if (finderResult.right){
             finderResult.parent.rightChild = new Node(key);
             this.addSumAndCount(key, true);
+            lock.unlock();
             return true;
         }
         else{
             finderResult.parent.leftChild = new Node(key);
             this.addSumAndCount(key, true);
+            lock.unlock();
             return true;
         }
     }
@@ -203,7 +214,9 @@ public class BST implements BSTInterface {
 
 
     public final boolean remove(final int key) {
+        lock.lock();
         if (this.root == null){
+            lock.unlock();
             return false;
         }
 
@@ -211,11 +224,13 @@ public class BST implements BSTInterface {
         if (resultOfFinder.foundOnRoot){
             removeRoot();
             this.addSumAndCount(key, false);
+            lock.unlock();
             return true;
         }
 
         if (resultOfFinder.found == false){
             //Did not find the item, so there is nothing to remove.
+            lock.unlock();
             return false;
         }
         
@@ -227,18 +242,24 @@ public class BST implements BSTInterface {
                 //The node to remove is a leaf, just cut it
                 resultOfFinder.parent.rightChild = null;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
                 //The node to remove has only left child
                 resultOfFinder.parent.rightChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
                 //The node to remove has only right child
                 resultOfFinder.parent.rightChild = ourNodeToRemove.rightChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
@@ -255,6 +276,8 @@ public class BST implements BSTInterface {
                     resultOfFinder.parent.rightChild = ourNodeToRemove.rightChild;
                     resultOfFinder.parent.rightChild.leftChild = ourNodeToRemove.leftChild;
                     this.addSumAndCount(key, false);
+                    lock.unlock();
+
                     return true;
                 }
                 resultOfFinder.parent.rightChild = successor;
@@ -267,6 +290,8 @@ public class BST implements BSTInterface {
                 successor.rightChild = ourNodeToRemove.rightChild;
                 successor.leftChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
         }
@@ -279,18 +304,24 @@ public class BST implements BSTInterface {
                 //The node to remove is a leaf, just cut it
                 resultOfFinder.parent.leftChild = null;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.rightChild == null && ourNodeToRemove.leftChild != null){
                 //The node to remove has only left child
                 resultOfFinder.parent.leftChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.leftChild == null && ourNodeToRemove.rightChild !=null){
                 //The node to remove has only right child
                 resultOfFinder.parent.leftChild = ourNodeToRemove.rightChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
             if (ourNodeToRemove.leftChild != null && ourNodeToRemove.rightChild != null){
@@ -307,6 +338,8 @@ public class BST implements BSTInterface {
                     resultOfFinder.parent.leftChild = ourNodeToRemove.rightChild;
                     resultOfFinder.parent.leftChild.leftChild = ourNodeToRemove.leftChild;
                     this.addSumAndCount(key, false);
+                    lock.unlock();
+
                     return true;
                 }
                 resultOfFinder.parent.leftChild = successor;
@@ -319,12 +352,14 @@ public class BST implements BSTInterface {
                 successor.rightChild = ourNodeToRemove.rightChild;
                 successor.leftChild = ourNodeToRemove.leftChild;
                 this.addSumAndCount(key, false);
+                lock.unlock();
+
                 return true;
             }
         }
 
         //Now we know that one of the children of parentOfKey is our node
-       
+        lock.unlock();
         return false;
 
     }

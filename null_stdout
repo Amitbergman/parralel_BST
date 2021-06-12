@@ -1,5 +1,5 @@
-BST-1thr-1048576keys-50i-50d 203308192 trial 0 : 20.0% done, elapsed 12s
-BST-1thr-1048576keys-50i-50d 203308192 trial 1 : 40.0% done, elapsed 24s
-BST-1thr-1048576keys-50i-50d 203308192 trial 2 : 60.0% done, elapsed 36s
-BST-1thr-1048576keys-50i-50d 203308192 trial 3 : 80.0% done, elapsed 48s
-BST-1thr-1048576keys-50i-50d 203308192 trial 4 : 100.0% done, elapsed 60s
+BST-4thr-1048576keys-40i-60d 203308192 trial 0 : 20.0% done, elapsed 12s
+BST-4thr-1048576keys-40i-60d 203308192 trial 1 : 40.0% done, elapsed 24s
+BST-4thr-1048576keys-40i-60d 203308192 trial 2 : 60.0% done, elapsed 36s
+BST-4thr-1048576keys-40i-60d 203308192 trial 3 : 80.0% done, elapsed 48s
+BST-4thr-1048576keys-40i-60d 203308192 trial 4 : 100.0% done, elapsed 60s
