@@ -196,8 +196,11 @@ public class BST implements BSTInterface {
 
         if (successorParent == this.root){
             //this means that the root has right child with no left childs
-            Node successor = successorParent.rightChild;
-            successor.leftChild = this.root.rightChild;
+            Node successor = this.root.rightChild;
+            if (successor.leftChild != null){
+                System.out.println("should not happen 12");
+            }
+            successor.leftChild = this.root.leftChild;
             this.root = successor;
             return;
         }
