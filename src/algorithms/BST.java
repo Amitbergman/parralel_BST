@@ -40,20 +40,21 @@ public class BST implements BSTInterface {
 
     //Do not call it if the root is null
     private finder findAnItemsPlace(final int key){
+        Node searcher = this.root;
 
-        if (this.root.valueOfTheNode == key){
+        if (searcher.valueOfTheNode == key){
             finder res = new finder();
             res.foundOnRoot = true;
             res.found = true;
             return res;
         }
-        Node searcher = this.root;
         
         while (true){
             boolean shouldGoLeft = searcher.valueOfTheNode > key;
             boolean shouldGoRight = searcher.valueOfTheNode < key;
             if (shouldGoLeft){
-                if (searcher.leftChild == null){
+                Node leftChild = searcher.leftChild;
+                if (leftChild == null){
                     finder res = new finder();
                     res.foundOnRoot = false;
                     res.found = false;
@@ -62,7 +63,7 @@ public class BST implements BSTInterface {
                     return res;
                 }
                 //Left child is not null
-                if (searcher.leftChild.valueOfTheNode == key){
+                if (leftChild.valueOfTheNode == key){
                     finder res = new finder();
                     res.foundOnRoot = false;
                     res.found = true;
@@ -73,13 +74,14 @@ public class BST implements BSTInterface {
                 }
                 //We should just go left and search there
                 if (searcher == searcher.leftChild){
-                    System.out.println("Should never happen");;
+                    System.out.println("Should never happen left");;
                 }
                 searcher = searcher.leftChild;
                 
             }
             if (shouldGoRight){
-                if (searcher.rightChild == null){
+                Node rightChild = searcher.rightChild;
+                if (rightChild == null){
                     finder res = new finder();
                     res.foundOnRoot = false;
                     res.found = false;
@@ -88,13 +90,13 @@ public class BST implements BSTInterface {
                     return res;
                 }
                 //Left child is not null
-                if (searcher.rightChild.valueOfTheNode == key){
+                if (rightChild.valueOfTheNode == key){
                     finder res = new finder();
                     res.foundOnRoot = false;
                     res.found = true;
                     res.parent = searcher;
                     res.right = true;
-                    res.child = searcher.rightChild;
+                    res.child = rightChild;
                     return res;
                 }
                 //We should just go left and search there
@@ -132,8 +134,9 @@ public class BST implements BSTInterface {
 
     public final boolean insert(final int key) {
         lock.lock();
+        Node newOne = new Node(key);
         if (this.root == null){
-            this.root = new Node(key);
+            this.root = newOne;
             this.addSumAndCount(key, true);
             lock.unlock();
             return true;
@@ -146,13 +149,13 @@ public class BST implements BSTInterface {
         }
 
         if (finderResult.right){
-            finderResult.parent.rightChild = new Node(key);
+            finderResult.parent.rightChild = newOne;
             this.addSumAndCount(key, true);
             lock.unlock();
             return true;
         }
         else{
-            finderResult.parent.leftChild = new Node(key);
+            finderResult.parent.leftChild = newOne;
             this.addSumAndCount(key, true);
             lock.unlock();
             return true;
