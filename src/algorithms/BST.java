@@ -44,8 +44,6 @@ public class BST implements BSTInterface {
 
     private Node sentinel;
     
-    private final ReentrantLock lock = new ReentrantLock();
-
     private Node root;
 
     public BST() {
@@ -53,8 +51,6 @@ public class BST implements BSTInterface {
         this.sentinel = new Node(0, true);
         this.sentinel.rightChild = this.root;
     }
-
-     
 
     private finder findAnItemsPlace(final int key){
         Node searcher = this.root;
@@ -74,6 +70,7 @@ public class BST implements BSTInterface {
         while (true){
             boolean shouldGoLeft = searcher.valueOfTheNode > key;
             boolean shouldGoRight = searcher.valueOfTheNode < key;
+            
             if (shouldGoLeft){
                 Node leftChild = searcher.leftChild;
                 if (leftChild == null){
@@ -98,7 +95,7 @@ public class BST implements BSTInterface {
                 if (searcher == searcher.leftChild){
                     System.out.println("Should never happen left");;
                 }
-                searcher = searcher.leftChild;
+                searcher = leftChild;
                 
             }
             if (shouldGoRight){
@@ -125,7 +122,7 @@ public class BST implements BSTInterface {
                 if (searcher == searcher.rightChild){
                     System.out.println("Should never happen right");;
                 }
-                searcher = searcher.rightChild;
+                searcher = rightChild;
             }
             
         }
