@@ -9,11 +9,11 @@ public class BST implements BSTInterface {
     
     private class Node {
         public int valueOfTheNode;
-        public Node rightChild;
-        public Node leftChild;
-        public ReentrantLock lock;
-        public boolean deleted;
-        public boolean isSentinel;
+        public volatile Node rightChild;
+        public volatile Node leftChild;
+        public final ReentrantLock lock;
+        public volatile boolean deleted;
+        public volatile boolean isSentinel;
 
         public Node(int value, boolean isSentinel){
             this.valueOfTheNode = value;
