@@ -23,7 +23,7 @@
             "request": "launch",
             "mainClass": "main.Main",
             "projectName": "hw5_ab041567",
-            "args": "1 5 6 -ins50 -del50 -keys1234"
+            "args": "1 5 12 -ins30 -del40 -keys123"
         }
     ]
 }
